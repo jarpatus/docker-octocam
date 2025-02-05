@@ -27,7 +27,6 @@ RUN mkdir -p $WWW_DIR/$STREAM_DIR
 RUN chown user:user $WWW_DIR/$STREAM_DIR
 COPY ./app/etc /etc
 COPY ./app/www $WWW_DIR/$STREAM_DIR
-RUN sed -i "s|\$STREAM_URL|$STREAM_URL|g" $WWW_DIR/$STREAM_DIR/index.html
 
 # Drop root
 USER user
