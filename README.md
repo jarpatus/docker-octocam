@@ -72,14 +72,42 @@ If you want to start and stop stream externally then you may want to mount some 
 
 ### Video4Linux
 If V4L_ARGS environment variable is set then v4l2-ctl will be ran when stream is started to set up webcam for streaming. In example Logitech C930 (and older C920 models) could be set up to provide H.264 1080p stream which can be use as it without transcoding:
-```--device=/dev/video0 --set-fmt-video=width=1920,height=1080,pixelformat=H264```
+```      - V4L_ARGS=--device=/dev/video0 --set-fmt-video=width=1920,height=1080,pixelformat=H264```
 
 Or mjpeg stream which would then require transcoding to H.264:
-```--device=/dev/video0 --set-fmt-video=width=1920,height=1080,pixelformat=mjpeg```
+```      - V4L_ARGS=--device=/dev/video0 --set-fmt-video=width=1920,height=1080,pixelformat=mjpeg```
 
-Exact commands depends on your webcam and it's capabilities. Getting usable H.264 stream directly from camera greatly reduced resource consumption as transcoding is not needed but may introduce huge lag (like 10+ seconds with C930).
+Exact commands depends on your webcam and it's capabilities. Getting usable H.264 stream directly from camera greatly reduced resource consumption as transcoding is not needed but may introduce huge lag (like 10+ seconds with C930) and quality can be relatively poor.
 
+### ffmpeg
 
+If webcam provides H.264 stream then we don't need transcoding and could use something like this:
 
+```
+      - FFMPEG_ARGS=-f v4l2 -input_format h264 -video_size 1920x1080 -framerate 30 -i /dev/video0
+                    -f alsa -i hw:1,0,0
+                    -c:v copy
+                    -c:a aac
+                    -f hls -hls_time 2 -hls_list_size 5 -hls_allow_cache 0
+                    -hls_flags delete_segments
+```
 
+If not or if quality or latency is an issue then we can do transcoding: 
 
+```
+      - FFMPEG_ARGS=-f v4l2 -input_format mjpeg -video_size 1920x1080 -framerate 30 -i /dev/video0
+                    -f alsa -i hw:1,0,0
+                    -c:v libx264 -profile:v baseline -level 3.0 -pix_fmt yuv420p -tune zerolatency -preset veryfast
+                    -g 60 -sc_threshold 0
+                    -c:a aac
+                    -f hls -hls_time 2 -hls_list_size 5 -hls_allow_cache 0
+                    -hls_flags delete_segments
+```
+
+Exact ffmpeg arguments can be fine tuned but these seemed to work with older C920 and Chrome and Firefox. 
+
+# External control
+TODO.
+
+# Reverse proxying
+TODO.
