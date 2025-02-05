@@ -52,11 +52,10 @@ services:
 
 ### Environment 
 Mandatory environment variables:
-* ```STREAM_URL``` - URL to HSL stream files on included HTTP server i.e. http://octoprint/stream 
-* ```V4L_ARGS``` - Arguments for v4l2-ctl for setting up webcam for streaming.
 * ```FFMPEG_ARGS``` - Arguments for ffmpeg for creating HLS stream.
 
 Optional environment variables:
+* ```V4L_ARGS``` - Arguments for v4l2-ctl for setting up webcam for streaming.
 * ```UID``` - UID to run container with. Defaults to 5024.
 * ```GID``` - GID to run container with. Defaults to 5024.
 * ```STREAM_DIR``` - Directory to which HLS stream files are placed on included HTTP server. Defautls to /stream.
@@ -69,6 +68,18 @@ Audio and video device files must be made available for the container, typically
 You absolutely do want to mount tmpfs as /www as in example so that HLS stream files are kept in memory only and won't be written to disk.
 
 ### Volumes
-If you want to start and stop stream externally then you may want to mount some folder on your host to /run/supervisor as unix socket allowing to control ffmpeg and httpd will be created there. Running the stream only when needed may be good idea to save some resources especially if transcoding has to be used.
+If you want to start and stop stream externally then you may want to mount some folder on your host to /run/supervisor as unix socket allowing to control ffmpeg and httpd will be created there. Running the stream only when needed may be good idea to save some resources especially if transcoding has to be used (it is also possible to start and stop container from OctoPrint but I don't like giving full access to docker to any container).
+
+### Video4Linux
+If V4L_ARGS environment variable is set then v4l2-ctl will be ran when stream is started to set up webcam for streaming. In example Logitech C930 (and older C920 models) could be set up to provide H.264 1080p stream which can be use as it without transcoding:
+```--device=/dev/video0 --set-fmt-video=width=1920,height=1080,pixelformat=H264```
+
+Or mjpeg stream which would then require transcoding to H.264:
+```--device=/dev/video0 --set-fmt-video=width=1920,height=1080,pixelformat=mjpeg```
+
+Exact commands depends on your webcam and it's capabilities. Getting usable H.264 stream directly from camera greatly reduced resource consumption as transcoding is not needed but may introduce huge lag (like 10+ seconds with C930).
+
+
+
 
 
