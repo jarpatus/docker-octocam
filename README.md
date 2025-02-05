@@ -107,7 +107,20 @@ If not or if quality or latency is an issue then we can do transcoding:
 Exact ffmpeg arguments can be fine tuned but these seemed to work with older C920 and Chrome and Firefox. 
 
 # External control
-TODO.
+Stream can be started and stopped externally by using supervisorctl as internally we use supervisor to manage ffmpeg and httpd. Mount some directory from host to /run/supervisor and you will supervisor.sock in it. Mount that directory to another container if needed e.g. OctoPrint and control from that container is possible.
+
+In example in OctoPrint we could install System Command Editor (or just edit config files manually) and define commands like this:
+Start stream:  ```supervisorctl -s unix:///run/supervisor/supervisord.sock start all```
+Stop stream: ```supervisorctl -s unix:///run/supervisor/supervisord.sock stop all```
+
+If octoprint runs in container then it does not come with supervisorctrl so it must be installed using something like this: 
+```
+docker exec octoprint apt-get update
+docker exec octoprint apt install -y supervisor
+```
+
+But it will disappear if container is re-created so could just create system command like this:
+Install supervisor: ```apt-get update && apt install -y supervisor```
 
 # Reverse proxying
 TODO.
