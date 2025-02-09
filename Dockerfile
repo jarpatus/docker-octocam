@@ -1,4 +1,4 @@
- # Start from Apline linux
+# Start from Apline linux
 FROM alpine:3.18
 
 # Expose ports
