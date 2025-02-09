@@ -111,7 +111,7 @@ If not or if quality or latency is an issue then we can do transcoding:
 Exact ffmpeg arguments can be fine tuned but these seemed to work with older C920 and Chrome and Firefox. 
 
 # Accessing the stream
-Video stram can be accessed from port 8080 under STREAM_DIR i.e. http://octocam.example:8080/stream .
+Video stram can be accessed from port 8080 under STREAM_DIR i.e. http://octocam.example:8080/stream . Index file will just show stream in HTML5 canvas (using hls.js if needed). Actual stream can be accessed from file stream.m3u8 e.g. http://octocam.example:8080/stream/stream.m3u8 (shuold just work with octoprint).
 
 ## Reverse proxying
 If you are using octoprint container and i.e. traefik it could be nice idea to reverse proxy stream under octoprint. Also enforcing https is always good.
