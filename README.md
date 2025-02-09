@@ -19,11 +19,10 @@ services:
       context: src
     restart: 'no'
     environment:
-      - UID=5024
-      - GID=5024
-      - STREAM_DIR=/stream
-      - STREAM_URL=https://octoprint/stream
-      - AUTOSTART=true
+#      - UID=5024
+#      - GID=5024
+#      - STREAM_DIR=/stream
+#      - AUTOSTART=true
       - V4L_ARGS=--device=/dev/video0 --set-fmt-video=width=1920,height=1080,pixelformat=H264
       - FFMPEG_ARGS=-f v4l2 -input_format h264 -video_size 1920x1080 -framerate 30 -i /dev/video0
                     -f alsa -i hw:1,0,0
@@ -62,7 +61,7 @@ Optional environment variables:
 * ```AUTOSTART``` - If set to false then stream won't be started on container start and must be started externally. Defaults to true.
 
 ### Devices
-Audio and video device files must be made available for the container, typically /dev/snd and /dev/video0 or /dev/video1.
+Audio and video device files must be made available for the container, typically /dev/snd and /dev/video0 or /dev/video1. Container drops root privileges but adds user to audio and video groups so make sure your device files can be accessed by those groups.
 
 ### Tmpfs
 You absolutely do want to mount tmpfs as /www as in example so that HLS stream files are kept in memory only and won't be written to disk.
@@ -72,10 +71,14 @@ If you want to start and stop stream externally then you may want to mount some 
 
 ### Video4Linux
 If V4L_ARGS environment variable is set then v4l2-ctl will be ran when stream is started to set up webcam for streaming. In example Logitech C930 (and older C920 models) could be set up to provide H.264 1080p stream which can be use as it without transcoding:
-```      - V4L_ARGS=--device=/dev/video0 --set-fmt-video=width=1920,height=1080,pixelformat=H264```
+```
+      - V4L_ARGS=--device=/dev/video0 --set-fmt-video=width=1920,height=1080,pixelformat=H264
+```
 
 Or mjpeg stream which would then require transcoding to H.264:
-```      - V4L_ARGS=--device=/dev/video0 --set-fmt-video=width=1920,height=1080,pixelformat=mjpeg```
+```
+      - V4L_ARGS=--device=/dev/video0 --set-fmt-video=width=1920,height=1080,pixelformat=mjpeg
+```
 
 Exact commands depends on your webcam and it's capabilities. Getting usable H.264 stream directly from camera greatly reduced resource consumption as transcoding is not needed but may introduce huge lag (like 10+ seconds with C930) and quality can be relatively poor.
 
@@ -106,6 +109,42 @@ If not or if quality or latency is an issue then we can do transcoding:
 
 Exact ffmpeg arguments can be fine tuned but these seemed to work with older C920 and Chrome and Firefox. 
 
+# Accessing the stream
+Video stram can be accessed from port 8080 under STREAM_DIR i.e. http://octocam.example:8080/stream .
+
+## Reverse proxying
+If you are using octoprint container and i.e. traefik it could be nice idea to reverse proxy stream under octoprint. Also enforcing https is always good.
+
+Example traefik config:
+
+```
+http:
+
+  routers:
+    octoprint-tls:
+      entryPoints:
+        - websecure
+      rule: "Host(`octoprint`)"
+      service: octoprint
+      tls: {}
+    octocam-tls:
+      entryPoints:
+        - websecure
+      rule: "Host(`octoprint`) && PathPrefix(`/stream`)"
+      service: octocam
+      tls: {}
+
+  services:
+    octoprint:
+      loadBalancer:
+        servers:
+          - url: "http://octoprint"
+    octocam:
+      loadBalancer:
+        servers:
+          - url: "http://octocam:8080"
+```
+
 # External control
 Stream can be started and stopped externally by using supervisorctl as internally we use supervisor to manage ffmpeg and httpd. Mount some directory from host to /run/supervisor and you will supervisor.sock in it. Mount that directory to another container if needed e.g. OctoPrint and control from that container is possible.
 
@@ -124,6 +163,3 @@ docker exec octoprint apt install -y supervisor
 But it will disappear if container is re-created so could just create system command like this:
 
 Install supervisor: ```apt-get update && apt install -y supervisor```
-
-# Reverse proxying
-TODO.
