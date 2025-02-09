@@ -54,8 +54,8 @@ Mandatory environment variables:
 * ```UID``` - UID to run container with.
 * ```GID``` - GID to run container with.
 * ```STREAM_DIR``` - Directory to which HLS stream files are placed on included HTTP server.
-* ```FFMPEG_ARGS``` - Arguments for ffmpeg for creating HLS stream.
 * ```AUTOSTART``` - If set to true then stream will be started on container start. If false then stream must be started externally.
+* ```FFMPEG_ARGS``` - Arguments for ffmpeg for creating HLS stream.
 
 Optional environment variables:
 * ```V4L_ARGS``` - Arguments for v4l2-ctl for setting up webcam for streaming.
