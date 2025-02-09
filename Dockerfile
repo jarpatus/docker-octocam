@@ -4,13 +4,6 @@ FROM alpine:3.18
 # Expose ports
 EXPOSE 8080
 
-# Set defaults
-ENV UID=5024
-ENV GID=5024
-ENV WWW_DIR=/www
-ENV STREAM_DIR=/stream
-ENV AUTOSTART=true
-
 # Add packages
 RUN apk add --no-cache busybox-extras ffmpeg supervisor v4l-utils
 
