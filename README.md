@@ -21,17 +21,14 @@ services:
     environment:
       - UID=5024
       - GID=5024
-      - WWW_DIR=/www
       - STREAM_DIR=/stream
-      - AUTOSTART=true
-      - V4L_ARGS=--device=/dev/video0 --set-fmt-video=width=1920,height=1080,pixelformat=H264
       - FFMPEG_ARGS=-f v4l2 -input_format h264 -video_size 1920x1080 -framerate 30 -i /dev/video0
                     -f alsa -i hw:1,0,0
                     -c:v copy
                     -c:a aac
                     -f hls -hls_time 2 -hls_list_size 5 -hls_allow_cache 0
                     -hls_flags delete_segments
-#      - V4L_ARGS=--device=/dev/video0 --set-fmt-video=width=1920,height=1080,pixelformat=mjpeg
+      - V4L_ARGS=--device=/dev/video0 --set-fmt-video=width=1920,height=1080,pixelformat=H264
 #      - FFMPEG_ARGS=-f v4l2 -input_format mjpeg -video_size 1920x1080 -framerate 30 -i /dev/video0
 #                    -f alsa -i hw:1,0,0
 #                    -c:v libx264 -profile:v baseline -level 3.0 -pix_fmt yuv420p -tune zerolatency -preset veryfast
@@ -39,6 +36,8 @@ services:
 #                    -c:a aac
 #                    -f hls -hls_time 2 -hls_list_size 5 -hls_allow_cache 0
 #                    -hls_flags delete_segments
+#      - V4L_ARGS=--device=/dev/video0 --set-fmt-video=width=1920,height=1080,pixelformat=mjpeg
+      - AUTOSTART=true
     devices:
       - /dev/snd:/dev/snd
       - /dev/video0:/dev/video0
@@ -52,13 +51,13 @@ services:
 
 ### Environment 
 Mandatory environment variables:
+* ```UID``` - UID to run container with.
+* ```GID``` - GID to run container with.
+* ```STREAM_DIR``` - Directory to which HLS stream files are placed on included HTTP server.
 * ```FFMPEG_ARGS``` - Arguments for ffmpeg for creating HLS stream.
 
 Optional environment variables:
 * ```V4L_ARGS``` - Arguments for v4l2-ctl for setting up webcam for streaming.
-* ```UID``` - UID to run container with. Defaults to 5024.
-* ```GID``` - GID to run container with. Defaults to 5024.
-* ```STREAM_DIR``` - Directory to which HLS stream files are placed on included HTTP server. Defautls to /stream.
 * ```AUTOSTART``` - If set to false then stream won't be started on container start and must be started externally. Defaults to true.
 
 ### Devices
