@@ -4,6 +4,9 @@ FROM alpine:3.18
 # Expose ports
 EXPOSE 8080
 
+# Set some defaults
+ENV WWW_DIR=/www
+
 # Add packages
 RUN apk add --no-cache busybox-extras ffmpeg supervisor v4l-utils
 
