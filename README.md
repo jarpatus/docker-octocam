@@ -22,6 +22,7 @@ services:
       - UID=5024
       - GID=5024
       - STREAM_DIR=/stream
+      - AUTOSTART=true
       - FFMPEG_ARGS=-f v4l2 -input_format h264 -video_size 1920x1080 -framerate 30 -i /dev/video0
                     -f alsa -i hw:1,0,0
                     -c:v copy
@@ -37,7 +38,6 @@ services:
 #                    -f hls -hls_time 2 -hls_list_size 5 -hls_allow_cache 0
 #                    -hls_flags delete_segments
 #      - V4L_ARGS=--device=/dev/video0 --set-fmt-video=width=1920,height=1080,pixelformat=mjpeg
-      - AUTOSTART=true
     devices:
       - /dev/snd:/dev/snd
       - /dev/video0:/dev/video0
@@ -55,10 +55,10 @@ Mandatory environment variables:
 * ```GID``` - GID to run container with.
 * ```STREAM_DIR``` - Directory to which HLS stream files are placed on included HTTP server.
 * ```FFMPEG_ARGS``` - Arguments for ffmpeg for creating HLS stream.
+* ```AUTOSTART``` - If set to true then stream will be started on container start. If false then stream must be started externally.
 
 Optional environment variables:
 * ```V4L_ARGS``` - Arguments for v4l2-ctl for setting up webcam for streaming.
-* ```AUTOSTART``` - If set to true then stream will be started on container start. Otherwise stream must be started externally.
 
 ### Devices
 Audio and video device files must be made available for the container, typically /dev/snd and /dev/video0 or /dev/video1. Container drops root privileges but adds user to audio and video groups so make sure your device files can be accessed by those groups.
