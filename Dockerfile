@@ -16,7 +16,7 @@ RUN apk add --no-cache busybox-extras ffmpeg supervisor v4l-utils
 
 # Add user 
 RUN addgroup -g $GID user
-RUN adduser -G user -D -H -u $UID user
+RUN adduser -s /sbin/nologin -G user -D -H -u $UID user
 RUN addgroup user audio
 RUN addgroup user video
 
