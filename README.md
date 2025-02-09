@@ -58,7 +58,7 @@ Mandatory environment variables:
 
 Optional environment variables:
 * ```V4L_ARGS``` - Arguments for v4l2-ctl for setting up webcam for streaming.
-* ```AUTOSTART``` - If set to false then stream won't be started on container start and must be started externally. Defaults to true.
+* ```AUTOSTART``` - If set to true then stream will be started on container start. Otherwise stream must be started externally.
 
 ### Devices
 Audio and video device files must be made available for the container, typically /dev/snd and /dev/video0 or /dev/video1. Container drops root privileges but adds user to audio and video groups so make sure your device files can be accessed by those groups.
