@@ -11,21 +11,21 @@ ENV WWW_DIR=/www
 RUN apk add --no-cache busybox-extras ffmpeg supervisor v4l-utils
 
 # Add user 
-RUN addgroup -g $GID user
-RUN adduser -s /sbin/nologin -G user -D -H -u $UID user
-RUN addgroup user audio
-RUN addgroup user video
+RUN addgroup -g $GID octocam
+RUN adduser -s /sbin/nologin -G octocam -D -H -u $UID octocam
+RUN addgroup octocam audio
+RUN addgroup octocam video
 
 # Create config files
 RUN mkdir -p /run/supervisor
-RUN chown user:user /run/supervisor
+RUN chown octocam:octocam /run/supervisor
 RUN mkdir -p $WWW_DIR/$STREAM_DIR
-RUN chown user:user $WWW_DIR/$STREAM_DIR
+RUN chown octocam:octocam $WWW_DIR/$STREAM_DIR
 COPY ./app/etc /etc
 COPY ./app/www $WWW_DIR/$STREAM_DIR
 
 # Drop root
-USER user
+USER octocam
 
 # Start supervisor
 CMD supervisord
