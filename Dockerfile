@@ -1,6 +1,10 @@
 # Start from Apline linux
 FROM alpine:3.18
 
+# Build args
+ARG UID=1000
+ARG GID=1000
+
 # Expose ports
 EXPOSE 8080
 

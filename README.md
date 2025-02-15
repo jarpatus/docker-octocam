@@ -17,10 +17,11 @@ services:
     container_name: octocam
     build:
       context: src
+      args:
+        - UID=1000
+        - GID=1000
     restart: 'no'
     environment:
-      - UID=5024
-      - GID=5024
       - STREAM_DIR=/stream
       - AUTOSTART=true
       - FFMPEG_ARGS=-f v4l2 -input_format h264 -video_size 1920x1080 -framerate 30 -i /dev/video0
@@ -49,10 +50,12 @@ services:
       - 8080:8080
 ```
 
-### Environment 
-Mandatory environment variables:
+### Build args
 * ```UID``` - UID to run container with.
 * ```GID``` - GID to run container with.
+
+### Environment 
+Mandatory environment variables:
 * ```STREAM_DIR``` - Directory to which HLS stream files are placed on included HTTP server.
 * ```AUTOSTART``` - If set to true then stream will be started on container start. If false then stream must be started externally.
 * ```FFMPEG_ARGS``` - Arguments for ffmpeg for creating HLS stream.
