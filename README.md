@@ -18,8 +18,8 @@ services:
     build:
       context: src
       args:
-        - UID=1000
-        - GID=1000
+        - UID=5000
+        - GID=5000
     restart: 'no'
     environment:
       - STREAM_DIR=/stream
