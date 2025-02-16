@@ -1,16 +1,9 @@
-# docker-octocam
-Lightweight webcam streamer and web server to be used e.g. with OctoPrint. Uses ffmpeg to copy/transcode webcam audio and video and to create HLS stream which is then made available over HTTP so that it can be used with all modern browser without any external plugins (external javascript is needed for non-Safari though). Optionally srtream can be started and stopped externally i.e. from OctoPrint. 
-
-# Build
-Clone repository to src/, create docker-compose.yaml and build:
-
-```
-git clone https://github.com/jarpatus/docker-octocam.git src
-nano docker-compose.yaml
-docker-compose build
-```
+# Octocam rootless
+Lightweight rootless webcam streamer and web server to be used e.g. with OctoPrint. Uses ffmpeg to copy/transcode webcam audio and video and to create HLS stream which is then made available over HTTP so that it can be used with all modern browser without any external plugins (external javascript is needed for non-Safari though). Optionally srtream can be started and stopped externally i.e. from OctoPrint. 
 
 # Compose file
+
+## Example
 ```
 services:
   octocam:
@@ -50,11 +43,11 @@ services:
       - 8080:8080
 ```
 
-### Build args
+## Build args
 * ```UID``` - UID to run container with.
 * ```GID``` - GID to run container with.
 
-### Environment 
+## Environment 
 Mandatory environment variables:
 * ```STREAM_DIR``` - Directory to which HLS stream files are placed on included HTTP server.
 * ```AUTOSTART``` - If set to true then stream will be started on container start. If false then stream must be started externally.
@@ -62,15 +55,6 @@ Mandatory environment variables:
 
 Optional environment variables:
 * ```V4L_ARGS``` - Arguments for v4l2-ctl for setting up webcam for streaming.
-
-### Devices
-Audio and video device files must be made available for the container, typically /dev/snd and /dev/video0 or /dev/video1. Container drops root privileges but adds user to audio and video groups so make sure your device files can be accessed by those groups.
-
-### Tmpfs
-You absolutely do want to mount tmpfs as /www as in example so that HLS stream files are kept in memory only and won't be written to disk.
-
-### Volumes
-If you want to start and stop stream externally then you may want to mount some folder on your host to /run/supervisor as unix socket allowing to control ffmpeg and httpd will be created there. Running the stream only when needed may be good idea to save some resources especially if transcoding has to be used (it is also possible to start and stop container from OctoPrint but I don't like giving full access to docker to any container).
 
 ### Video4Linux
 If V4L_ARGS environment variable is set then v4l2-ctl will be ran when stream is started to set up webcam for streaming. In example Logitech C930 (and older C920 models) could be set up to provide H.264 1080p stream which can be use as it without transcoding:
@@ -111,6 +95,15 @@ If not or if quality or latency is an issue then we can do transcoding:
 ```
 
 Exact ffmpeg arguments can be fine tuned but these seemed to work with older C920 and Chrome and Firefox. 
+
+## Devices
+Audio and video device files must be made available for the container, typically /dev/snd and /dev/video0 or /dev/video1. Container drops root privileges but adds user to audio and video groups so make sure your device files can be accessed by those groups.
+
+## Tmpfs
+You absolutely do want to mount tmpfs as /www as in example so that HLS stream files are kept in memory only and won't be written to disk.
+
+## Volumes
+If you want to start and stop stream externally then you may want to mount some folder on your host to /run/supervisor as unix socket allowing to control ffmpeg and httpd will be created there. Running the stream only when needed may be good idea to save some resources especially if transcoding has to be used (it is also possible to start and stop container from OctoPrint but I don't like giving full access to docker to any container).
 
 # Accessing the stream
 Video stram can be accessed from port 8080 under STREAM_DIR i.e. http://octocam.example:8080/stream . Index file will just show stream in HTML5 canvas (using hls.js if needed). Actual stream can be accessed from file stream.m3u8 e.g. http://octocam.example:8080/stream/stream.m3u8 (shuold just work with octoprint).
