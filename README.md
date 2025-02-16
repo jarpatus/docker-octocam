@@ -134,7 +134,7 @@ http:
     octoprint:
       loadBalancer:
         servers:
-          - url: "http://octoprint"
+          - url: "http://octoprint:5000"
     octocam:
       loadBalancer:
         servers:
